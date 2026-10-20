@@ -84,26 +84,52 @@ port 3000. No frontend environment changes are needed for this setup.
 
 ### 3. Testing Walkthrough
 
-1. Sign in as John Smith. Open a course to view its fields and enrolled
-   students. His list includes Open, Close, and Cancel courses.
-2. Sign in as Michael Lee to start with an empty course list. Create a course
-   with multiple topics, edit its fields, and delete it before anyone enrolls.
-3. Sign in as Alice Johnson. Check **My enrollments**, browse **All courses**,
-   and search for `html` or `emma`. Cancel courses are hidden; closed and full
-   courses cannot accept new enrollments.
-4. Sign in as Sophia Davis to start with no enrollments. Enroll in an Open
-   course with space, then check **My enrollments**. A student can enroll in
-   each course only once.
-5. Sign in as the course owner and check the enrolled student list. A course
-   with enrollments cannot be deleted, and its capacity cannot be reduced
-   below its enrollment count. Other teachers cannot access or change it.
-6. Refresh while signed in to check session persistence, then sign out to
-   return to the login page. Protected API requests without a session return
-   `401`.
+The following describes the expected behavior using the seeded demo accounts.
+Changes made during testing remain in the database.
 
-Separate browser profiles or a private window allow simultaneous accounts.
-Tabs in the same profile share the session cookie. Changes made during testing
-remain in the database.
+1. **Authentication:** Entering an incorrect password displays an error and
+   does not open a protected page. Signing in shows the account's name and
+   role, and refreshing preserves the session. Signing out returns to login.
+   Protected API requests without a valid session return `401`.
+
+2. **Roles and ownership:** John and Emma each see only their own courses.
+   Michael starts with an empty course list. Accessing another teacher's
+   course returns `404`. Student requests to create, update, or delete courses
+   return `403`, as do teacher requests to enroll.
+
+3. **Teacher course management:** Creating a course saves its name, duration,
+   multiple topics, price, Max Student, and status. Editing its fields saves
+   the changes. Deleting a course with no enrollments removes it from the list
+   and makes its detail URL unavailable. HTML Fundamentals shows Alice and
+   Daniel in its enrolled student list; attempting to delete it returns `409`.
+
+4. **Enrollment rules:** Enrolling Sophia in an Open course with space adds
+   it to her enrollments and adds her to the teacher's student list. Duplicate,
+   full-course, and closed-course enrollment requests return `409`. Concurrent
+   requests cannot overbook a course or enroll the same student twice.
+   Reducing capacity below the enrollment count is also rejected.
+
+5. **Student course functions:** Alice's enrollment list contains HTML
+   Fundamentals, CSS Layout, and Next.js APIs; Sophia's starts empty.
+   Searching `html` or `emma` matches part of a course or teacher name,
+   regardless of case. Open courses allow enrollment when space remains;
+   Close courses stay visible without accepting enrollments. Cancel courses
+   are hidden, and direct student access returns `404`.
+
+6. **Frontend behavior:** Selecting Fill login enters the chosen demo
+   credentials without submitting the form. Lists show loading and empty
+   states, and failed requests display errors. Missing course fields, invalid
+   duration or capacity, and negative prices are rejected. Enrollment and
+   deletion controls reflect the same restrictions enforced by the API.
+
+7. **Deployed application:** The public application supports login, course
+   management, and enrollment without a Vercel account. Saved changes remain
+   available after refreshing or signing in again.
+
+8. **Code and checks:** The original backend and frontend directories are
+   retained. Credentials, setup, and deployed URLs are documented here.
+   Passwords are hashed and environment secrets are excluded from Git.
+   Lint, build, and API verification commands are listed under **Checks**.
 
 ## API
 

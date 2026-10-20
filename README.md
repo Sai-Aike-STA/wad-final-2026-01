@@ -7,8 +7,8 @@ The supplied `next-backend/` and `react-frontend/` structure is retained.
 
 - **Student Name:** Sai Aike Shwe Tun Aung
 - **Student ID:** 6712122
-- **Deployed frontend:** tbd
-- **Deployed backend:** tbd
+- **Deployed frontend:** https://wad-final-2026-01-ebon.vercel.app/#/login
+- **Deployed backend:** https://wad-final-2026-01-ebon.vercel.app/api
 
 ## Test Credentials
 

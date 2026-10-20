@@ -6,9 +6,9 @@ The supplied `next-backend/` and `react-frontend/` structure is retained.
 ## Student Information
 
 - **Student Name:** Sai Aike Shwe Tun Aung
-- **Student ID:** Fill in before submission.
-- **Deployed frontend:** Fill in after deployment.
-- **Deployed backend:** Fill in after deployment.
+- **Student ID:** 6712122
+- **Deployed frontend:** tbd
+- **Deployed backend:** tbd
 
 ## Test Credentials
 

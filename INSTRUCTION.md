@@ -1,6 +1,5 @@
 # Final Examination Instructions
 
-Welcome to the Web Development Final Examination. This repository contains the base code for your exam.
 
 ## Overview
 

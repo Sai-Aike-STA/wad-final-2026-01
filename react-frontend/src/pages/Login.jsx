@@ -40,7 +40,7 @@ export default function Login() {
       </form>
       <section className="demo-accounts" aria-labelledby="demo-accounts-heading">
         <h2 id="demo-accounts-heading">Demo accounts</h2>
-        <p>Copy an email and password below to test either role. Use the email address to sign in.</p>
+        <p>The following demo accounts can be used to login and test the application. </p>
         <div className="table-wrap">
           <table>
             <thead>

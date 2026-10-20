@@ -1,25 +1,20 @@
-// src/lib/mongodb.js
-
 import { MongoClient } from "mongodb";
 
-const options = {};
-let globalClientPromise;
+let clientPromise;
 
 export function getClientPromise() {
-  const uri = process.env.MONGODB_URI;
-  if (!uri) {
-    throw new Error(
-      "Please add your Mongo URI to .env.local or set MONGODB_URI env variable",
-    );
+  if (!process.env.MONGODB_URI) throw new Error("MONGODB_URI is required.");
+  if (!clientPromise) {
+    const client = new MongoClient(process.env.MONGODB_URI, { serverSelectionTimeoutMS: 10000 });
+    clientPromise = client.connect().catch((error) => {
+      clientPromise = undefined;
+      throw error;
+    });
   }
-  if (process.env.NODE_ENV === "development") {
-    if (!globalClientPromise) {
-      const client = new MongoClient(uri, options);
-      globalClientPromise = client.connect();
-    }
-    return globalClientPromise;
-  } else {
-    const client = new MongoClient(uri, options);
-    return client.connect();
-  }
+  return clientPromise;
+}
+
+export async function getDb() {
+  const client = await getClientPromise();
+  return client.db(process.env.DB_NAME || "csx4107_final_2026");
 }

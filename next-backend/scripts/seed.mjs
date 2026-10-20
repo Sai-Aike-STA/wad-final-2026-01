@@ -6,7 +6,7 @@ nextEnv.loadEnvConfig(process.cwd(), true);
 
 const uri = process.env.MONGODB_URI;
 if (!uri) {
-  console.error("Set MONGODB_URI in next-backend/.env.local before running npm run seed.");
+  console.error("Set MONGODB_URI in next-backend/.env before running npm run seed.");
   process.exit(1);
 }
 

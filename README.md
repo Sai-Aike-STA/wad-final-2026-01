@@ -43,15 +43,15 @@ From the repository root:
 ```sh
 cd next-backend
 npm ci
-cp .env.example .env.local
+cp .env.example .env
 ```
 
-Edit `.env.local` locally. Set `MONGODB_URI` to the connection string and
+Edit `.env` locally. Set `MONGODB_URI` to the connection string and
 `JWT_SECRET` to a long random secret. Keep `DB_NAME=csx4107_final_2026` to use
 a database separate from earlier assignments. Keep
 `FRONTEND_URL=http://localhost:5173` and `COOKIE_SAME_SITE=lax` for local use.
 The application also defaults to `csx4107_final_2026` if `DB_NAME` is absent.
-Do not commit `.env.local`.
+Do not commit `.env`.
 
 Then run:
 

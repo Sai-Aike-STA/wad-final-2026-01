@@ -224,49 +224,35 @@ configure production routing as described below.
 
 ## Vercel Deployment Settings
 
-Pushing and deployment are handled by the student. Deploy the same repository
-as two Vercel projects with these root directories:
+Pushing and deployment are handled by the student. Deploy one Vercel project
+using **Root Directory `./`** and **Application Preset Services**. The root
+`vercel.json` builds both apps and routes `/api/*` to `next-backend` and all
+other requests to `react-frontend`, preserving the existing API paths.
+Push this configuration before refreshing the Vercel import screen.
 
-- Backend: `next-backend`, using the Next.js preset.
-- Frontend: `react-frontend`, using the Vite preset, build command
-  `npm run build`, and output directory `dist`.
-
-Set these backend environment variables in Vercel:
+Add these project environment variables for Production and Preview:
 
 | Variable | Value |
 | --- | --- |
-| `MONGODB_URI` | MongoDB connection string |
+| `MONGODB_URI` | Copy the value from `next-backend/.env` |
 | `DB_NAME` | `csx4107_final_2026` |
-| `JWT_SECRET` | A long random secret |
-| `FRONTEND_URL` | Exact production frontend origin, including `https://` |
-| `COOKIE_SAME_SITE` | `lax` for the recommended same-origin rewrite |
+| `JWT_SECRET` | Copy the value from `next-backend/.env` |
+| `COOKIE_SAME_SITE` | `lax` |
 
-Allow the Vercel backend to connect in Atlas network settings. Seed the same
-database locally with `npm run seed` before testing the deployed application.
-Both production and local instances share data if they use the same database.
+The Import .env button can import `next-backend/.env`. Remove the imported
+`FRONTEND_URL=http://localhost:5173` entry for deployment. Frontend and API use
+the same origin, which the backend already accepts. If setting `FRONTEND_URL`
+explicitly later, use the actual public production origin with `https://` and
+no trailing slash. Leave `VITE_API_URL` unset so the frontend calls `/api` on
+its own domain. Vercel sets `NODE_ENV` automatically.
 
-For reliable cookie authentication, leave frontend `VITE_API_URL` unset and
-add this `vercel.json` inside `react-frontend/`, replacing the example backend
-hostname with the real production backend hostname:
+Allow the deployed backend to connect in Atlas network settings. The named
+accounts and enrollments already seeded locally are available in production
+when the connection and database name match. Deployment does not run the seed
+command or reset data.
 
-```json
-{
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "https://YOUR-BACKEND.vercel.app/api/:path*"
-    }
-  ]
-}
-```
+After deployment, open the public production URL and verify login, refresh,
+course creation, and enrollment. Use that URL for grading and confirm Vercel
+Deployment Protection allows the grader to access it.
 
-This serves API requests through the frontend's origin, including the login
-cookie. HashRouter handles frontend page navigation. Use the public production
-backend domain, and make sure Vercel Deployment Protection does not block API
-requests. Redeploy the frontend after adding its rewrite configuration.
-
-Alternatively, set frontend `VITE_API_URL` to the backend origin and backend
-`COOKIE_SAME_SITE=none`, with `FRONTEND_URL` set to the frontend origin. This
-uses secure cross-site cookies in production and depends on the browser
-allowing third-party cookies. The same-origin rewrite avoids that dependency.
-Frontend environment changes require a new build/deployment.
+Reference: [Vercel Services guide](https://vercel.com/kb/guide/vercel-services).

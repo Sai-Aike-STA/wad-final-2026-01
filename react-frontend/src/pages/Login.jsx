@@ -2,6 +2,15 @@ import { useContext, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext.js";
 
+const demoAccounts = [
+  { role: "Teacher", username: "teacher1" },
+  { role: "Teacher", username: "teacher2" },
+  { role: "Teacher", username: "teacher3" },
+  { role: "Student", username: "student1" },
+  { role: "Student", username: "student2" },
+  { role: "Student", username: "student3" },
+];
+
 export default function Login() {
   const { user, login, initializationError } = useContext(UserContext);
   const [email, setEmail] = useState("");
@@ -29,6 +38,32 @@ export default function Login() {
         <label>Password<input type="password" autoComplete="current-password" required value={password} onChange={(event) => setPassword(event.target.value)} /></label>
         <button disabled={busy}>{busy ? "Signing in..." : "Sign in"}</button>
       </form>
+      <section className="demo-accounts" aria-labelledby="demo-accounts-heading">
+        <h2 id="demo-accounts-heading">Demo accounts</h2>
+        <p>Copy an email and password below to test either role. Use the email address to sign in.</p>
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Role</th>
+                <th scope="col">Username</th>
+                <th scope="col">Email</th>
+                <th scope="col">Password</th>
+              </tr>
+            </thead>
+            <tbody>
+              {demoAccounts.map(({ role, username }) => (
+                <tr key={username}>
+                  <td>{role}</td>
+                  <td>{username}</td>
+                  <td><code>{username}@example.com</code></td>
+                  <td><code>Course2026!</code></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </main>
   );
 }

@@ -18,7 +18,9 @@ button { cursor: pointer; background: #175c9b; color: white; width: fit-content;
 button:disabled { opacity: .55; cursor: not-allowed; }
 :focus-visible { outline: 3px solid #6b99c5; outline-offset: 2px; }
 [role="alert"] { color: #9e2020; }
-.login { max-width: 450px; }
+.login { max-width: 800px; }
+.login form { max-width: 400px; }
+.demo-accounts { margin-top: 32px; }
 .course-form { max-width: 650px; }
 .search { display: flex; align-items: end; flex-wrap: wrap; margin-bottom: 20px; }
 .search label { flex: 1; min-width: 200px; }

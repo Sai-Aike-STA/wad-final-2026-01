@@ -15,17 +15,19 @@ The supplied `next-backend/` and `react-frontend/` structure is retained.
 Run the seed command below to create these accounts. Each account has the
 password **`Course2026!`**. Passwords are stored as bcrypt hashes in MongoDB.
 
-| Role | Username | Email |
-| --- | --- | --- |
-| Teacher | teacher1 | teacher1@example.com |
-| Teacher | teacher2 | teacher2@example.com |
-| Teacher | teacher3 | teacher3@example.com |
-| Student | student1 | student1@example.com |
-| Student | student2 | student2@example.com |
-| Student | student3 | student3@example.com |
+| Role | Username | Email | Initial state |
+| --- | --- | --- | --- |
+| Teacher 1 | John Smith | johnsmith.teacher1@example.com | Web courses with enrolled Students and all three statuses |
+| Teacher 2 | Emma Wilson | emmawilson.teacher2@example.com | Backend courses, including a full course |
+| Teacher 3 | Michael Lee | michaellee.teacher3@example.com | New Teacher with no courses |
+| Student 1 | Alice Johnson | alicejohnson.student1@example.com | Enrolled in HTML Fundamentals, CSS Layout, and Next.js APIs |
+| Student 2 | Daniel Brown | danielbrown.student2@example.com | Enrolled in HTML Fundamentals and MongoDB Basics |
+| Student 3 | Sophia Davis | sophiadavis.student3@example.com | New Student with no enrollments |
 
 Sign in with an email address and password. Registration and role editing are
 not required by the examination and are not exposed through the application.
+The login page has a collapsed Demo accounts section with these credentials,
+a short description of each account, and a Fill login button.
 
 ## Prerequisites
 
@@ -60,18 +62,25 @@ npm run seed
 npm run dev
 ```
 
-The API runs at `http://localhost:3000`. The seed command creates three
-Teachers, three Students, and five sample courses. It preserves existing
-accounts, passwords, courses, and enrollments when run again. It does not reset
-test data. If a test course is deleted, rerunning the seed recreates it.
+The API runs at `http://localhost:3000`. The seed command creates six named
+accounts, five sample courses, and existing enrollments for Alice and Daniel.
+Michael and Sophia start with no courses or enrollments. The displayed account
+descriptions refer to this initial state; grading actions change that state.
 
-| Sample course | Owner | Status | Max Student |
-| --- | --- | --- | --- |
-| HTML Fundamentals | teacher1 | Open | 2 |
-| CSS Layout | teacher1 | Close | 10 |
-| JavaScript Workshop | teacher1 | Cancel | 10 |
-| MongoDB Basics | teacher2 | Open | 1 |
-| Next.js APIs | teacher3 | Open | 3 |
+The first updated seed migrates the original generic accounts while retaining
+their IDs and passwords. Courses from the old third Teacher move to Emma, and
+the old third Student's enrollments are cleared to provide the blank accounts.
+Other course records are retained. Later seed runs preserve existing courses
+and enrollment changes; they do not reset grading progress. Deleted sample
+courses are recreated with their initial enrollments when seeded again.
+
+| Sample course | Owner | Status | Initial enrollment | Enrolled Students |
+| --- | --- | --- | --- | --- |
+| HTML Fundamentals | John Smith | Open | 2 / 3 | Alice, Daniel |
+| CSS Layout | John Smith | Close | 1 / 10 | Alice |
+| JavaScript Workshop | John Smith | Cancel | 0 / 10 | None |
+| MongoDB Basics | Emma Wilson | Open | 1 / 1 | Daniel |
+| Next.js APIs | Emma Wilson | Open | 1 / 4 | Alice |
 
 ### 2. Frontend Setup (`react-frontend/`)
 
@@ -94,7 +103,7 @@ Use separate browser profiles or a private window for simultaneous users.
 Tabs in the same browser profile share the login cookie.
 
 1. **Authentication (3 points):** Sign in with invalid credentials and confirm
-   an error. Sign in as `teacher1@example.com`, refresh, and confirm the session
+   an error. Sign in as `johnsmith.teacher1@example.com`, refresh, and confirm the session
    is retained. Sign out and confirm protected pages require login. Calling
    `GET /api/course` without the login cookie must return `401`.
 2. **Roles and ownership (4 points):** Teacher 1 sees only their own courses.
@@ -109,17 +118,19 @@ Tabs in the same browser profile share the login cookie.
    confirm its details show the Student's username and email. Deletion must
    fail with `409`, even through a direct API request. Capacity cannot be
    reduced below the existing enrollment count.
-4. **Enrollment rules (7 points):** As Student 1, enroll in HTML Fundamentals.
-   Confirm enrollment appears in My enrollments and remains after refresh.
-   Repeat the enrollment request and expect `409`. Enroll Student 2 in the same
-   course, then try Student 3 and expect `409` because its capacity is two.
-   Confirm CSS Layout rejects enrollment with `409` and the Cancel course is
-   unavailable to Students, including direct detail and enrollment requests.
-   For a concurrency check, create a course with one seat and submit enrollment
-   requests from two different Students together. Exactly one should succeed.
+4. **Enrollment rules (7 points):** Alice and Daniel already have enrollments.
+   As Alice, confirm HTML Fundamentals, CSS Layout, and Next.js APIs appear in
+   My enrollments, then repeat enrollment in HTML and expect `409`. As Sophia,
+   confirm My enrollments is initially empty, then enroll in HTML's final seat
+   and repeat that request to check duplicate prevention. As Alice, attempt to
+   enroll in the full MongoDB Basics course and expect `409`. CSS Layout must
+   reject new enrollments, and the Cancel course is hidden from Students,
+   including direct detail and enrollment requests. For a concurrency check,
+   create a course with one seat and send enrollment requests from two Students
+   together. Exactly one should succeed.
 5. **Student course functions (4 points):** Students see all Open and Close
    courses across Teachers. Search `html` to match part of a course name and
-   `teacher2` to match a Teacher's username. Search is case-insensitive and
+   `emma` to match part of Emma Wilson's name. Search is case-insensitive and
    treats punctuation literally. View course details and My enrollments.
    Cancel courses are hidden from both Student lists and Student detail access.
 6. **Frontend integration and usability (3 points):** Check loading messages,
@@ -139,7 +150,7 @@ For local API testing, save a login cookie in a temporary cookie jar:
 curl -i http://localhost:3000/api/course
 curl -i -c /tmp/course-teacher.cookies http://localhost:3000/api/auth/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"teacher1@example.com","password":"Course2026!"}'
+  -d '{"email":"johnsmith.teacher1@example.com","password":"Course2026!"}'
 curl -b /tmp/course-teacher.cookies http://localhost:3000/api/course
 ```
 
@@ -199,6 +210,13 @@ npm run build
 ```
 
 For a local production run of the backend, use `npm start` after building.
+To verify the API rules against the configured finals database, run
+`npm run check:api` in `next-backend/` after building and before changing the
+initial demo state. It starts its own local
+production server, uses temporary courses for mutation and concurrency checks,
+and removes those courses afterward. It checks authentication, both roles,
+ownership, course validation and CRUD, filtering, enrollment constraints,
+student privacy, status changes, cookies, and the blank demo accounts.
 If Turbopack cannot start a worker in a restricted environment, the backend
 also supports `npm run build -- --webpack`.
 Vite's development API proxy is not part of the frontend production build;

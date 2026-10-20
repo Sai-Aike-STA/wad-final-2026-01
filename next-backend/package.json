@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "node scripts/seed.mjs"
+    "seed": "node scripts/seed.mjs",
+    "check:api": "node scripts/check-api.mjs"
   },
   "dependencies": {
     "@mui/icons-material": "^9.3.1",
